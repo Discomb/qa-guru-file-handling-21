@@ -2,8 +2,8 @@ package guru.qa.tests;
 
 import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
+import com.google.common.io.Files;
 import com.opencsv.CSVReader;
-import guru.qa.utils.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +27,11 @@ public class FileParsingTest {
 
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName();
-                String ext = Utils.getFileExtension(entryName);
+                String ext = Files.getFileExtension(entryName);
 
 
                 switch (ext) {
+
                     case ("csv"):
                         try (InputStream str = cl.getResourceAsStream(entryName);
                              Reader reader = new InputStreamReader(str)) {
@@ -64,7 +65,6 @@ public class FileParsingTest {
                         }
 
                     case ("xlsx"):
-
                         try (InputStream str = cl.getResourceAsStream(entryName)) {
                             assert str != null;
                             XLS xls = new XLS(str);
@@ -73,7 +73,6 @@ public class FileParsingTest {
 
                             Assertions.assertEquals("Склад", testedCell);
                             break;
-
                         }
                 }
 

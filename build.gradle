@@ -17,6 +17,7 @@ dependencies {
             'com.codeborne:xls-test:1.4.3',
             'com.google.guava:guava:32.1.2-jre',
             'com.opencsv:opencsv:5.8',
+            'com.fasterxml.jackson.core:jackson-core:2.13.1',
             'org.slf4j:slf4j-simple:2.0.5')
 }
 
