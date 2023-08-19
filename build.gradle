@@ -14,7 +14,7 @@ dependencies {
             "com.codeborne:selenide:6.16.0",
             "org.junit.jupiter:junit-jupiter:5.9.3",
             'com.codeborne:pdf-test:1.8.1',
-            'com.codeborne:xls-test:1.7.0',
+            'com.codeborne:xls-test:1.4.3',
             'com.google.guava:guava:32.1.2-jre',
             'com.opencsv:opencsv:5.8',
             'org.slf4j:slf4j-simple:2.0.5')

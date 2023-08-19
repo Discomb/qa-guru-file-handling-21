@@ -16,4 +16,5 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-/gradle/
+gradle/
+.idea/

@@ -1,6 +1,7 @@
 package guru.qa.tests;
 
 import com.codeborne.pdftest.PDF;
+import com.codeborne.xlstest.XLS;
 import com.opencsv.CSVReader;
 import guru.qa.utils.Utils;
 import org.junit.jupiter.api.Assertions;
@@ -63,12 +64,20 @@ public class FileParsingTest {
                         }
 
                     case ("xlsx"):
-                        System.out.println(ext + " - это мы в кейсе эксель");
-                        break;
 
+                        try (InputStream str = cl.getResourceAsStream(entryName)) {
+                            assert str != null;
+                            XLS xls = new XLS(str);
+
+                            String testedCell = xls.excel.getSheetAt(2).getRow(2).getCell(1).toString();
+
+                            Assertions.assertEquals("Склад", testedCell);
+                            break;
+
+                        }
                 }
-            }
 
+            }
         }
     }
 }
