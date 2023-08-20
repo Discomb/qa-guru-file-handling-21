@@ -1,0 +1,18 @@
+{
+    "client": {
+		"uuid": "6fcc03c7-e013-49a3-b770-d1a51fbdbfdf",
+        "title": "Mr.",
+		"name": "John",
+		"surname": "Doe",
+		"dateOfBirth": "12 Jan 1988",
+        "description": "example client",
+		"userGroups": ["EXT", "PREMIUM"],
+		"address": {
+			"country": "France",
+			"city": "Paris",
+			"street": "Rue Mumia Abu-Jamal",
+			"building": "6",
+			"flat": "104"
+        }
+    }
+}
