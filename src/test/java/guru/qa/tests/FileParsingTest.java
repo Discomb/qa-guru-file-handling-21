@@ -10,11 +10,14 @@ import model.JsonExampleModel;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class FileParsingTest {
@@ -23,9 +26,16 @@ public class FileParsingTest {
 
     @Test
     public void checkZipFile() throws Exception {
-        try (InputStream stream = cl.getResourceAsStream("zip_example.zip")) {
-            assert stream != null;
-            try (ZipInputStream zis = new ZipInputStream(stream)) {
+
+        URL resource = cl.getResource("zip_example.zip");
+        assert resource != null;
+        File file = new File(resource.getFile());
+
+        try (InputStream str = cl.getResourceAsStream("zip_example.zip")
+        ) {
+            assert str != null;
+            try (ZipInputStream zis = new ZipInputStream(str);
+                 ZipFile zipFile = new ZipFile(file)) {
 
                 ZipEntry entry;
 
@@ -33,12 +43,10 @@ public class FileParsingTest {
                     String entryName = entry.getName();
                     String ext = Files.getFileExtension(entryName);
 
-
                     switch (ext) {
                         case ("csv") -> {
-                            try (InputStream str = cl.getResourceAsStream(entryName)) {
-                                assert str != null;
-                                try (Reader reader = new InputStreamReader(str)) {
+                            try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                                try (Reader reader = new InputStreamReader(entryStr)) {
 
                                     CSVReader csvReader = new CSVReader(reader);
                                     List<String[]> content = csvReader.readAll();
@@ -57,9 +65,8 @@ public class FileParsingTest {
                             }
                         }
                         case ("pdf") -> {
-                            try (InputStream str = cl.getResourceAsStream(entryName)) {
-                                assert str != null;
-                                PDF pdf = new PDF(str);
+                            try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                                PDF pdf = new PDF(entryStr);
 
                                 String content = pdf.text;
 
@@ -68,9 +75,8 @@ public class FileParsingTest {
                             }
                         }
                         case ("xlsx") -> {
-                            try (InputStream str = cl.getResourceAsStream(entryName)) {
-                                assert str != null;
-                                XLS xls = new XLS(str);
+                            try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                                XLS xls = new XLS(entryStr);
 
                                 String testedCell = xls.excel.getSheetAt(2).getRow(2).getCell(1).toString();
 
@@ -83,6 +89,7 @@ public class FileParsingTest {
             }
         }
     }
+
 
     @Test
     public void checkJsonFile() throws Exception {
