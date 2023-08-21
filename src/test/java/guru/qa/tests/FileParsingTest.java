@@ -24,18 +24,20 @@ public class FileParsingTest {
 
     private final ClassLoader cl = FileParsingTest.class.getClassLoader();
 
-    @Test
-    public void checkZipFile() throws Exception {
-
+    private File getZip() {
         URL resource = cl.getResource("zip_example.zip");
         assert resource != null;
-        File file = new File(resource.getFile());
+        return new File(resource.getFile());
+    }
+
+    @Test
+    public void checkZipFile() throws Exception {
 
         try (InputStream str = cl.getResourceAsStream("zip_example.zip")
         ) {
             assert str != null;
             try (ZipInputStream zis = new ZipInputStream(str);
-                 ZipFile zipFile = new ZipFile(file)) {
+                 ZipFile zipFile = new ZipFile(getZip())) {
 
                 ZipEntry entry;
 
@@ -90,6 +92,104 @@ public class FileParsingTest {
         }
     }
 
+    @Test
+    public void checkCsvInZip() throws Exception {
+
+        try (InputStream str = cl.getResourceAsStream("zip_example.zip")
+        ) {
+            assert str != null;
+            try (ZipInputStream zis = new ZipInputStream(str);
+                 ZipFile zipFile = new ZipFile(getZip())) {
+
+                ZipEntry entry;
+
+                while ((entry = zis.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    String ext = Files.getFileExtension(entryName);
+
+                    if (ext.equals("csv")) {
+                        try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                            try (Reader reader = new InputStreamReader(entryStr)) {
+
+                                CSVReader csvReader = new CSVReader(reader);
+                                List<String[]> content = csvReader.readAll();
+
+                                Assertions.assertThat(content.size()).isEqualTo(3);
+
+                                final String[] firstRow = content.get(0);
+                                final String[] secondRow = content.get(1);
+                                final String[] thirdRow = content.get(2);
+
+                                Assertions.assertThat(firstRow).isEqualTo(new String[]{"тест1", "тест2", "тест123"});
+                                Assertions.assertThat(secondRow).isEqualTo(new String[]{"это", "зеленый", "тест"});
+                                Assertions.assertThat(thirdRow).isEqualTo(new String[]{"тест2", "тест3", "тест666"});
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void checkPdfInZip() throws Exception {
+        try (InputStream str = cl.getResourceAsStream("zip_example.zip")
+        ) {
+            assert str != null;
+            try (ZipInputStream zis = new ZipInputStream(str);
+                 ZipFile zipFile = new ZipFile(getZip())) {
+
+                ZipEntry entry;
+
+                while ((entry = zis.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    String ext = Files.getFileExtension(entryName);
+
+                    if (ext.equals("pdf")) {
+
+                        try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                            PDF pdf = new PDF(entryStr);
+
+                            String content = pdf.text;
+
+                            Assertions.assertThat(content).contains("Билет на каток");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void checkXlsxInZip() throws Exception {
+        try (InputStream str = cl.getResourceAsStream("zip_example.zip")
+        ) {
+            assert str != null;
+            try (ZipInputStream zis = new ZipInputStream(str);
+                 ZipFile zipFile = new ZipFile(getZip())) {
+
+                ZipEntry entry;
+
+                while ((entry = zis.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    String ext = Files.getFileExtension(entryName);
+
+                    if (ext.equals("xlsx")) {
+                        try (InputStream entryStr = zipFile.getInputStream(entry)) {
+                            XLS xls = new XLS(entryStr);
+
+                            String testedCell = xls.excel.getSheetAt(2).getRow(2).getCell(1).toString();
+
+                            Assertions.assertThat(testedCell).isEqualTo("Склад");
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
 
     @Test
     public void checkJsonFile() throws Exception {
@@ -129,3 +229,4 @@ public class FileParsingTest {
         }
     }
 }
+
